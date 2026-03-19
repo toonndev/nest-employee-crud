@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Department } from './department.entity';
 
-@Entity('Employee')
+@Entity('employee')
 export class EmpRecord {
   @PrimaryColumn({ type: 'varchar', length: 10 })
   EmpNum: string;

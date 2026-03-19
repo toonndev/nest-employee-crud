@@ -1,12 +1,5 @@
+import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  ApiHideProperty,
-  ApiProperty,
-  ApiPropertyOptional,
-} from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -16,84 +9,42 @@ import {
 } from 'class-validator';
 
 export class CreateEmployeeDto {
-  @ApiProperty({
-    description: 'First name (ชื่อ)',
-    example: 'สมชาย',
-    maxLength: 100,
-  })
-  @MaxLength(100, { message: 'FIRST_NAME_MAXIMUM_LENGTH' })
+  @ApiProperty({ description: 'Employee name (ชื่อพนักงาน)', example: 'Kanjana', maxLength: 100 })
+  @MaxLength(100, { message: 'EMP_NAME_MAXIMUM_LENGTH' })
   @IsString({ message: 'INVALID_PARAMETER' })
-  @IsNotEmpty({ message: 'FIRST_NAME_REQUIRED' })
-  firstName: string;
+  @IsNotEmpty({ message: 'EMP_NAME_REQUIRED' })
+  EmpName: string;
 
-  @ApiProperty({
-    description: 'Last name (นามสกุล)',
-    example: 'ใจดี',
-    maxLength: 100,
-  })
-  @MaxLength(100, { message: 'LAST_NAME_MAXIMUM_LENGTH' })
+  @ApiProperty({ description: 'Hire date (วันที่เริ่มงาน)', example: '1994-07-10' })
   @IsString({ message: 'INVALID_PARAMETER' })
-  @IsNotEmpty({ message: 'LAST_NAME_REQUIRED' })
-  lastName: string;
+  @IsNotEmpty({ message: 'HIRE_DATE_REQUIRED' })
+  HireDate: string;
 
-  @ApiProperty({
-    description: 'Email address (อีเมล)',
-    example: 'somchai@example.com',
-    maxLength: 255,
-  })
-  @MaxLength(255, { message: 'EMAIL_MAXIMUM_LENGTH' })
-  @IsEmail({}, { message: 'INVALID_EMAIL_FORMAT' })
-  @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
-  email: string;
-
-  @ApiProperty({
-    description: 'Job position (ตำแหน่งงาน)',
-    example: 'Software Developer',
-    maxLength: 150,
-  })
-  @MaxLength(150, { message: 'POSITION_MAXIMUM_LENGTH' })
-  @IsString({ message: 'INVALID_PARAMETER' })
-  @IsNotEmpty({ message: 'POSITION_REQUIRED' })
-  position: string;
-
-  @ApiProperty({
-    description: 'Salary (เงินเดือน)',
-    example: 50000,
-  })
+  @ApiProperty({ description: 'Salary (เงินเดือน)', example: 50000 })
   @IsNumber({}, { message: 'INVALID_PARAMETER' })
   @IsPositive({ message: 'SALARY_MUST_BE_POSITIVE' })
   @IsNotEmpty({ message: 'SALARY_REQUIRED' })
-  salary: number;
+  Salary: number;
 
-  @ApiPropertyOptional({
-    description: 'Department (แผนก)',
-    example: 'Engineering',
-    maxLength: 150,
-  })
-  @MaxLength(150, { message: 'DEPARTMENT_MAXIMUM_LENGTH' })
+  @ApiPropertyOptional({ description: 'Position (ตำแหน่ง)', example: 'Manager', maxLength: 100 })
+  @MaxLength(100, { message: 'POSITION_MAXIMUM_LENGTH' })
   @IsString({ message: 'INVALID_PARAMETER' })
   @IsOptional()
-  department?: string;
+  Position?: string;
 
-  @ApiPropertyOptional({
-    description: 'Active status (สถานะการใช้งาน)',
-    example: true,
-    default: true,
-  })
+  @ApiPropertyOptional({ description: 'Department number (รหัสแผนก)', example: '10', maxLength: 10 })
+  @MaxLength(10, { message: 'DEP_NO_MAXIMUM_LENGTH' })
+  @IsString({ message: 'INVALID_PARAMETER' })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      if (value.toLowerCase() === 'true') return true;
-      if (value.toLowerCase() === 'false') return false;
-    }
-    return value;
-  })
-  @IsBoolean({ message: 'INVALID_PARAMETER' })
-  isActive?: boolean;
+  DepNo?: string;
+
+  @ApiPropertyOptional({ description: 'Head employee number (รหัสหัวหน้า)', example: '0001', maxLength: 10 })
+  @MaxLength(10, { message: 'HEAD_NO_MAXIMUM_LENGTH' })
+  @IsString({ message: 'INVALID_PARAMETER' })
+  @IsOptional()
+  HeadNo?: string;
 
   @ApiHideProperty()
   @IsOptional()
-  @IsString({ message: 'INVALID_PARAMETER' })
-  @MaxLength(100, { message: 'CREATED_BY_MAXIMUM_LENGTH' })
   createdBy?: string;
 }

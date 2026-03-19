@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { Employee } from '../../entities/employee.entity';
 import { Department } from '../../entities/department.entity';
 import { EmpRecord } from '../../entities/emp-record.entity';
 import { EmployeeBackup } from '../../entities/employee-backup.entity';
@@ -13,21 +14,21 @@ const dataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'password',
   database: process.env.DB_NAME || 'employee_crud',
   schema: process.env.DB_SCHEMA || 'public',
+  dropSchema: true,
   synchronize: true,
-  entities: [Department, EmpRecord, EmployeeBackup],
+  entities: [Employee, Department, EmpRecord, EmployeeBackup],
 });
 
 async function seed() {
   await dataSource.initialize();
   console.log('Connected to database');
 
+  const employeeRepo = dataSource.getRepository(Employee);
   const departmentRepo = dataSource.getRepository(Department);
-  const empRepo = dataSource.getRepository(EmpRecord);
+  const empRecordRepo = dataSource.getRepository(EmpRecord);
   const backupRepo = dataSource.getRepository(EmployeeBackup);
 
-  // Clear existing data with CASCADE to handle FK constraints
-  await dataSource.query(`TRUNCATE TABLE "EmployeeBackup", "Employee", "Department" CASCADE`);
-  console.log('Cleared existing data');
+  console.log('Tables dropped and recreated');
 
   // Seed departments
   const departments = departmentRepo.create([
@@ -41,8 +42,7 @@ async function seed() {
   await departmentRepo.save(departments);
   console.log('Seeded departments (6 rows)');
 
-  // Seed employees
-  const employees = empRepo.create([
+  const empData = [
     { EmpNum: '0001', EmpName: 'Kanjana',   HireDate: '1994-07-10', Salary: 50000, Position: 'Managing Director', DepNo: '00', HeadNo: null },
     { EmpNum: '1001', EmpName: 'Surasit',   HireDate: '1994-03-15', Salary: 30000, Position: 'Manager',           DepNo: '10', HeadNo: '0001' },
     { EmpNum: '1002', EmpName: 'Jintana',   HireDate: '1993-10-31', Salary: 20000, Position: 'Supervisor',        DepNo: '10', HeadNo: '1001' },
@@ -56,18 +56,24 @@ async function seed() {
     { EmpNum: '3005', EmpName: 'Tawatchai', HireDate: '1994-07-03', Salary: 10000, Position: 'Salesman',          DepNo: '30', HeadNo: '3001' },
     { EmpNum: '4001', EmpName: 'Wichai',    HireDate: '1993-12-26', Salary: 33000, Position: 'Manager',           DepNo: '40', HeadNo: '0001' },
     { EmpNum: '4002', EmpName: 'Thidarat',  HireDate: '1994-01-12', Salary: 9000,  Position: 'Clerk',             DepNo: '40', HeadNo: '4001' },
-  ]);
-  await empRepo.save(employees);
+  ];
+
+  // Seed employees (CRUD table)
+  await employeeRepo.save(employeeRepo.create(empData));
   console.log('Seeded employees (13 rows)');
 
-  // Seed EmployeeBackup from DepNo 20 and 30
+  // Seed exercise employee table
+  await empRecordRepo.save(empRecordRepo.create(empData));
+  console.log('Seeded employee table (13 rows)');
+
+  // Seed employee_backup from DepNo 20 and 30
   await dataSource.query(`
-    INSERT INTO "EmployeeBackup" ("EmpNum", "EmpName", "Salary", "Position")
+    INSERT INTO "employee_backup" ("EmpNum", "EmpName", "Salary", "Position")
     SELECT "EmpNum", "EmpName", "Salary", "Position"
-    FROM "Employee"
+    FROM "employee"
     WHERE "DepNo" IN ('20', '30')
   `);
-  console.log('Seeded EmployeeBackup (DepNo 20, 30)');
+  console.log('Seeded employee_backup (DepNo 20, 30)');
 
   await dataSource.destroy();
   console.log('Seeding completed!');
