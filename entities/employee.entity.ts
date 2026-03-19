@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Unique } from 'typeorm';
 
 @Entity('employees')
 @Unique(['EmpNum'])
@@ -27,8 +27,17 @@ export class Employee {
   @Column({ type: 'varchar', length: 10, nullable: true })
   HeadNo: string;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  createdBy: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  updatedBy: string;
+
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
 export const employeeAttributes: (keyof Employee)[] = [
@@ -40,5 +49,8 @@ export const employeeAttributes: (keyof Employee)[] = [
   'Position',
   'DepNo',
   'HeadNo',
+  'createdBy',
+  'updatedBy',
   'createdAt',
+  'updatedAt',
 ];
