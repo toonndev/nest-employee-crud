@@ -19,7 +19,11 @@ async function bootstrap() {
     new FastifyAdapter({ logger: false }),
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   app.useGlobalPipes(
     new GlobalValidationPipe({ whitelist: true, transform: true }),

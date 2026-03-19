@@ -43,6 +43,14 @@ export class EmployeesController {
     @BodyWithCreatedBy() createEmployeeDto: CreateEmployeeDto,
     @Res() res: FastifyReply,
   ) {
+    const duplicate = await this.employeesService.findByEmpNum(createEmployeeDto.EmpNum);
+    if (duplicate) {
+      throw new HttpException(
+        MSG_MASTER.DUPLICATE_ENTRY,
+        MSG_MASTER.DUPLICATE_ENTRY.httpStatus,
+      );
+    }
+
     const createdData = await this.employeesService.create(createEmployeeDto);
     if (!createdData) {
       throw new HttpException(

@@ -14,20 +14,8 @@ export class EmployeesService {
     private readonly employeeRepository: Repository<Employee>,
   ) { }
 
-  private async generateEmpNum(depNo: string): Promise<string> {
-    const prefix = (depNo ?? '00').padStart(2, '0');
-    const last = await this.employeeRepository.findOne({
-      where: { DepNo: depNo },
-      order: { EmpNum: 'DESC' },
-      select: ['EmpNum'],
-    });
-    const seq = last ? parseInt(last.EmpNum.slice(-2), 10) + 1 : 1;
-    return prefix + String(seq).padStart(2, '0');
-  }
-
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-    const EmpNum = await this.generateEmpNum(createEmployeeDto.DepNo ?? '00');
-    const employee = this.employeeRepository.create({ ...createEmployeeDto, EmpNum });
+    const employee = this.employeeRepository.create(createEmployeeDto);
     return this.employeeRepository.save(employee);
   }
 
@@ -37,12 +25,13 @@ export class EmployeesService {
     let whereConditions: any = {};
 
     if (DepNo) {
-      whereConditions.DepNo = DepNo;
+      whereConditions.DepNo = ILike(`%${DepNo}%`);
     }
 
     if (search) {
       const baseWhere = { ...whereConditions };
       whereConditions = [
+        { ...baseWhere, EmpNum: ILike(`%${search}%`) },
         { ...baseWhere, EmpName: ILike(`%${search}%`) },
         { ...baseWhere, Position: ILike(`%${search}%`) },
       ];

@@ -9,10 +9,16 @@ import {
 } from 'class-validator';
 
 export class CreateEmployeeDto {
+  @ApiProperty({ description: 'Employee number (รหัสพนักงาน)', example: '0001', maxLength: 10 })
+  @MaxLength(10, { message: 'EMP_NUM_MAXIMUM_LENGTH' })
+  @IsString({ message: 'INVALID_PARAMETER' })
+  @IsNotEmpty({ message: 'คุณยังไม่ได้กรอกรหัสพนักงาน' })
+  EmpNum: string;
+
   @ApiProperty({ description: 'Employee name (ชื่อพนักงาน)', example: 'Kanjana', maxLength: 100 })
   @MaxLength(100, { message: 'EMP_NAME_MAXIMUM_LENGTH' })
   @IsString({ message: 'INVALID_PARAMETER' })
-  @IsNotEmpty({ message: 'EMP_NAME_REQUIRED' })
+  @IsNotEmpty({ message: 'คุณยังไม่ได้กรอกชื่อพนักงาน' })
   EmpName: string;
 
   @ApiProperty({ description: 'Hire date (วันที่เริ่มงาน)', example: '1994-07-10' })
@@ -26,11 +32,11 @@ export class CreateEmployeeDto {
   @IsNotEmpty({ message: 'SALARY_REQUIRED' })
   Salary: number;
 
-  @ApiPropertyOptional({ description: 'Position (ตำแหน่ง)', example: 'Manager', maxLength: 100 })
+  @ApiProperty({ description: 'Position (ตำแหน่ง)', example: 'Manager', maxLength: 100 })
   @MaxLength(100, { message: 'POSITION_MAXIMUM_LENGTH' })
   @IsString({ message: 'INVALID_PARAMETER' })
-  @IsOptional()
-  Position?: string;
+  @IsNotEmpty({ message: 'คุณยังไม่ได้เลือกตำแหน่ง' })
+  Position: string;
 
   @ApiPropertyOptional({ description: 'Department number (รหัสแผนก)', example: '10', maxLength: 10 })
   @MaxLength(10, { message: 'DEP_NO_MAXIMUM_LENGTH' })
